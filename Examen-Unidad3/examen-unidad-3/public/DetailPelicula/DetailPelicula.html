@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="../style/homeStyle.css">
+    <link rel="stylesheet" href="../NavBar/nav.css">
+    <title>Pelicula</title>
+</head>
+<body>
+    <div id="app">
+        <nav>
+            <div class="logo">
+                <a href="home.html">
+                    <img src="https://www.pngall.com/wp-content/uploads/13/Movie-PNG-Image.png" alt="ReelFlix Logo">
+                    <span>ReelFlix</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="home.html">Home</a></li>
+                <li><a  @click="cerrarSesion">Log out</a></li>
+            </ul>
+        </nav>
+        <div v-if="selectedMovie">
+            <div class="botoneskeywords">
+                <button @click="goBack"> <---- </button>
+            </div>
+            <h1>{{ selectedMovie.title }}</h1>
+
+            <div class="movie-info">
+
+                <img v-if="selectedMovie.poster_path" 
+                    :src="'https://image.tmdb.org/t/p/w500' + selectedMovie.poster_path" 
+                    :style="{ width: '300px', marginLeft: '10vw', marginRight: '5vw' }"
+                >
+                <div class="movie-details">
+                    <p>
+                        <strong>Genres: </strong>
+                        <div class="botoneskeywords">
+                            <button v-for="(genre, index) in selectedMovie.genres" :key="index" @click="goGenre(genre)">
+                                {{ genre.name }}<span v-if="index < selectedMovie.genres.length - 1"></span>
+                            </button>
+                        </div>
+                    </p>
+                    <p><cite>{{ selectedMovie.tagline }}</cite></p>
+                    <p><strong>Overview: </strong>{{ selectedMovie.overview }}</p>
+                    <p v-if="selectedMovie.runtime">
+                        <strong>Runtime: </strong>{{ Math.floor(selectedMovie.runtime / 60) }}h {{ selectedMovie.runtime % 60 }}min
+                    </p>
+                    <p v-else>
+                        <strong>Runtime: </strong> Not available
+                    </p>
+                    <p><strong>Release Date: </strong>{{ selectedMovie.release_date }}</p>
+                    <p v-if="selectedMovie.vote_average !== null && selectedMovie.vote_average !== undefined">
+                        <strong>Average votes: </strong>{{ selectedMovie.vote_average.toFixed(1) }}%
+                    </p>
+                    <p v-else>
+                        <strong>Avergae votes: </strong> Not available
+                    </p>
+                </div>
+                <div class="movie-details">
+                    <p><strong>Status: </strong>{{ selectedMovie.status }}</p>
+                    <p><strong>Original Language: </strong>{{ selectedMovie.original_language }}</p>
+                    <p><strong>Budget: $</strong>{{ selectedMovie.budget ? selectedMovie.budget.toLocaleString() : 0 }}</p>
+                    <p><strong>Revenue: $</strong>{{ selectedMovie.revenue ? selectedMovie.revenue.toLocaleString() : 0 }}</p>
+                    <div class="botoneskeywords">
+                        <p>
+                            <strong>Favorite: </strong>
+                            <button @click="toggleFavorite">
+                            {{ isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}
+                        </button>
+                        </p>
+                    </div>
+                    
+                    <strong>Keywords:</strong>
+                    <div class="botoneskeywords">
+                        <button v-for="(keyword, index) in showMore ? keywords : keywords.slice(0, 5)" :key="keyword.id" @click="goKeyword(keyword)">
+                            {{ keyword.name }}
+                        </button>
+                        <button v-if="keywords.length > 6" @click="showMore = !showMore" style="background-color: #ff4141;">
+                            {{ showMore ? 'See Less' : 'See More' }}
+                        </button>
+                    </div> 
+                </div>
+            </div>
+            <h2>Top Billed Cast:</h2>
+            <div v-if="cast.length"></div>
+                <div class="movies">
+                    <div class="movie" v-for="actor in cast" :key="actor.id">
+                        <img :src="actor.profile_path ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` : 'https://icones.pro/wp-content/uploads/2021/06/icone-d-image-rouge.png'" :alt="actor.name">
+                        <p><h4>{{ actor.name }}</h4> {{ actor.character }} </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h1 style="display: block;">Trailer</h1>
+                <div v-if="trailer" class="trailer-container">
+                    <iframe 
+                        width="560" 
+                        height="315" 
+                        :src="`https://www.youtube.com/embed/${trailer}`" 
+                        frameborder="0" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+            <h2>Recommendations:</h2>
+            <div v-if="recommendations.length">
+                <div class="movies">
+                    <div class="movie" v-for="recommendation in recommendations" :key="recommendation.id">
+                        <img 
+                        :src="`https://image.tmdb.org/t/p/w200${recommendation.poster_path}`" 
+                        :alt="recommendation.title" 
+                        @click="irPelicula(recommendation)" />
+                        <h4>{{ recommendation.title }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="DetailPelicula.js"></script>
+</body>
+</html>
